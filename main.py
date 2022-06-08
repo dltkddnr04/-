@@ -13,7 +13,6 @@ access_token = json_data["access_token"]
 
 repeat_check = True
 
-date = datetime.today().strftime('%Y-%m-%d %H:%M')
 path = "" # 파일이 저장될 경로를 지정해준다.
 streamer = "" # 자동 다운로드 하고싶은 스트리머의 영문 닉네임을 입력해준다.
 
@@ -37,7 +36,7 @@ def stream_check(streamer):
         return True
 
 def stream_download(streamer):
-    date = datetime.today().strftime('%Y-%m-%d %H:%M')
+    date = datetime.today().strftime('%Y-%m-%d %H-%M')
     subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path + "/" + date + ".ts"])
 
 console_print("프로그램 시작됨")
