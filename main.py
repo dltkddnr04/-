@@ -4,8 +4,8 @@ import subprocess
 import time
 from datetime import datetime
 
-client_id = "5ayor8kn22hxinl6way2j1ejzi41g2" # 트위치에서 발급한 클라이언트 아이디 키
-client_secret = "8tp18ssnpzbrzyyf0he83q3lsfayyx" # 트위치에서 발급한 클라이언트 시크릿 키
+client_id = "" # 트위치에서 발급한 클라이언트 아이디 키
+client_secret = "" # 트위치에서 발급한 클라이언트 시크릿 키
 
 req = requests.post("https://id.twitch.tv/oauth2/token?client_id=" + client_id + "&client_secret=" + client_secret + "&grant_type=client_credentials")
 json_data = json.loads(req.text)
@@ -14,8 +14,8 @@ access_token = json_data["access_token"]
 repeat_check = True
 
 date = datetime.today().strftime('%Y-%m-%d %H:%M')
-path = "/home/dltkddnr04/auto_record/Twitch_auto_record/yunlithe" # 파일이 저장될 경로를 지정해준다.
-streamer = "yunlithe" # 자동 다운로드 하고싶은 스트리머의 영문 닉네임을 입력해준다.
+path = "" # 파일이 저장될 경로를 지정해준다.
+streamer = "" # 자동 다운로드 하고싶은 스트리머의 영문 닉네임을 입력해준다.
 
 def console_print(message):
     print("[" + datetime.today().strftime('%Y-%m-%d %H:%M:%S') + "] " + message)
@@ -37,6 +37,7 @@ def stream_check(streamer):
         return True
 
 def stream_download(streamer):
+    date = datetime.today().strftime('%Y-%m-%d %H:%M')
     subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path + "/" + date + ".ts"])
 
 console_print("프로그램 시작됨")
