@@ -37,7 +37,7 @@ def stream_check(streamer):
 
 def stream_download(streamer):
     date = datetime.today().strftime('%Y-%m-%d %H-%M')
-    subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path + "/" + date + ".ts"])
+    subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path + "\\" + date + ".ts"])
 
 console_print("프로그램 시작됨")
 
