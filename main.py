@@ -41,11 +41,11 @@ def stream_check(streamer):
 def stream_download(streamer):
     date = datetime.today().strftime('%Y-%m-%d %H-%M-%S')
     if platform.system() == "Windows":
-        path = path + "\\" + date + ".ts"
+        path_final = path + "\\" + streamer + "\\" + date + ".ts"
     else:
-        path = path + "/" + date + ".ts"
-    
-    subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path])
+        path_final = path + "/" + streamer + "/" + date + ".ts"
+
+    subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path_final])
 
 console_print("프로그램 시작됨")
 
