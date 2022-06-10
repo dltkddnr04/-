@@ -2,6 +2,7 @@ import requests
 import json
 import subprocess
 import time
+import platform
 from datetime import datetime
 
 client_id = "" # 트위치에서 발급한 클라이언트 아이디 키
@@ -15,6 +16,8 @@ repeat_check = True
 
 path = "" # 파일이 저장될 경로를 지정해준다.
 streamer = "" # 자동 다운로드 하고싶은 스트리머의 영문 닉네임을 입력해준다.
+
+path = path.replace("\\", "\\\\")
 
 def console_print(message):
     print("[" + datetime.today().strftime('%Y-%m-%d %H:%M:%S') + "] " + message)
@@ -36,8 +39,13 @@ def stream_check(streamer):
         return True
 
 def stream_download(streamer):
-    date = datetime.today().strftime('%Y-%m-%d %H-%M')
-    subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path + "\\" + date + ".ts"])
+    date = datetime.today().strftime('%Y-%m-%d %H-%M-%S')
+    if platform.system() == "Windows":
+        path = path + "\\" + date + ".ts"
+    else:
+        path = path + "/" + date + ".ts"
+    
+    subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path])
 
 console_print("프로그램 시작됨")
 
