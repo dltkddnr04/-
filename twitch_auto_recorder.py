@@ -42,7 +42,7 @@ class MyApp(QWidget):
 
         self.start_program()
 
-        now_version = "1.0.1"
+        now_version = "1.0.0"
         req = requests.get("https://api.github.com/repos/dltkddnr04/Twitch-Auto-Recorder/releases/latest")
         last_version = req.json()["name"]
 
