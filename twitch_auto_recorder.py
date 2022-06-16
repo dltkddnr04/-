@@ -42,6 +42,25 @@ class MyApp(QWidget):
 
         self.start_program()
 
+        now_version = "1.0.1"
+        req = requests.get("https://api.github.com/repos/dltkddnr04/Twitch-Auto-Recorder/releases/latest")
+        last_version = req.json()["name"]
+
+        now_version = now_version.split('.')
+        last_version = last_version[1:].split('.')
+
+        if int(now_version[0]) != int(last_version[0]):
+            QMessageBox.information(self, "Error", "새로운 버전이 사용가능합니다.\n업데이트해주세요.\n업데이트 주소:\nhttps://github.com/dltkddnr04/Twitch-Auto-Recorder/releases")
+            sys.exit()
+        else:
+            if int(now_version[1]) != int(last_version[1]):
+                QMessageBox.information(self, "Error", "새로운 버전이 사용가능합니다.\n업데이트해주세요.\n업데이트 주소:\nhttps://github.com/dltkddnr04/Twitch-Auto-Recorder/releases")
+                sys.exit()
+            else:
+                if int(now_version[2]) != int(last_version[2]):
+                    QMessageBox.information(self, "Error", "새로운 버전이 사용가능합니다.\n업데이트해주세요.\n업데이트 주소:\nhttps://github.com/dltkddnr04/Twitch-Auto-Recorder/releases")
+                    sys.exit()
+
     def createSetupGroup(self):
         groupbox = QGroupBox('설정')
         grid = QGridLayout()
