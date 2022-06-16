@@ -49,20 +49,40 @@ class MyApp(QWidget):
         self.streamer_edit = qtwid.QLineEdit(self)
         self.save_btn = qtwid.QPushButton("추가",self)
         self.lbox_item = qtwid.QListWidget(self)
-        self.btn_remove = qtwid.QPushButton("등록해제",self)
+        #self.btn_group = qtwid.QPushButton("등록해제",self)
 
         self.streamer_edit.setToolTip('스트리머의 영문 닉네임을 입력하세요')
-        self.btn_remove.setEnabled(False)
-
+        
         grid.addWidget(QLabel("스트리머 영문 닉네임"), 0, 0)
         grid.addWidget(self.streamer_edit, 1, 0)
         grid.addWidget(self.save_btn, 1, 1)
         grid.addWidget(self.lbox_item, 2, 0)
-        grid.addWidget(self.btn_remove, 2, 1)
+        grid.addWidget(self.btn_group(), 2, 1)
 
         self.save_btn.clicked.connect(self.Btn_addClick)        
         self.lbox_item.itemSelectionChanged.connect(self.Lbox_itemSelectionChange)
+
+        groupbox.setLayout(grid)
+        return groupbox
+
+    def btn_group(self):
+        groupbox = QGroupBox()
+        grid = QGridLayout()
+
+        self.btn_remove = qtwid.QPushButton("등록해제",self)
+        #self.btn_start = qtwid.QPushButton("시작",self)
+        #self.btn_stop = qtwid.QPushButton("정지",self)
+
+        grid.addWidget(self.btn_remove, 0, 0)
+        #grid.addWidget(self.btn_start, 1, 0)
+        #grid.addWidget(self.btn_stop, 2, 0)
+
         self.btn_remove.clicked.connect(self.Btn_removeClick)
+        #self.btn_start.clicked.connect(self.Btn_startClick)
+        #self.btn_stop.clicked.connect(self.Btn_stopClick)
+
+        self.btn_remove.setEnabled(False)
+        #self.btn_stop.setEnabled(False)
 
         groupbox.setLayout(grid)
         return groupbox
@@ -98,7 +118,7 @@ class MyApp(QWidget):
         date = datetime.today().strftime('%Y-%m-%d %H-%M-%S')
         path = "./" + streamer + "/" + date + ".ts"
     
-        subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path])
+        subprocess.run(["streamlink", "twitch.tv/" + streamer, "best", "-o", path])
 
     def stream_record(self, streamer, streamer_id):
         while True:
@@ -106,7 +126,7 @@ class MyApp(QWidget):
                 self.console_print(streamer + "님 방송 시작")
                 self.stream_download(streamer)
                 self.console_print(streamer + "님 방송 종료")
-            if self.lbox_item.findItems(streamer, Qt.MatchExactly):
+            if not self.lbox_item.findItems(streamer, Qt.MatchExactly):
                 break
             time.sleep(3)
 
@@ -185,6 +205,31 @@ class MyApp(QWidget):
 
         self.lbox_item.takeItem(self.lbox_item.currentRow())
         self.console_print(selected_streamer + "님 등록해제 완료")
+
+    """
+    def Btn_startClick(self):
+        self.btn_start.setEnabled(False)
+        # background_process thread 시작
+        threading.Thread(target=self.background_process, name="background_process").start()
+
+        self.console_print("프로세스 시작됨")
+        self.btn_stop.setEnabled(True)
+        return
+
+    def Btn_stopClick(self):
+        self.btn_stop.setEnabled(False)
+        # background_process thread 강제로 종료
+
+
+        self.console_print("프로세스 종료됨")
+        self.btn_start.setEnabled(True)
+        return
+
+    def background_process(self):
+        while True:
+            time.sleep(1)
+    """
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
