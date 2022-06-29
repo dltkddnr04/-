@@ -1,10 +1,12 @@
 # Twitch-Auto-Recorder
 트위치 방송 자동 다운로드 프로그램
 
-CUI 프로그램용 Twitch API키 발급<br>
+## CUI 프로그램
+Twitch API키 발급 링크<br>
 https://dev.twitch.tv/console/apps/create
 
-윈도우용 프로그램 다운로드 링크<br>
+## 윈도우용 GUI 프로그램
+다운로드 링크<br>
 https://github.com/dltkddnr04/Twitch-Auto-Recorder/releases/
 
 윈도우용 사용시 StreamLink 필요<br>
