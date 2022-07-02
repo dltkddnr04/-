@@ -41,17 +41,17 @@ def stream_download(streamer):
 
     subprocess.call(["streamlink", "twitch.tv/" + streamer, "best", "-o", path])
 
-console_print("프로그램 시작됨")
+console_print("Program started")
 
 while True:
     if stream_check(streamer):
-        console_print("스트리밍 시작이 감지되었습니다")
+        console_print(streamer + " start streaming")
         stream_download(streamer)
-        console_print("스트리밍이 완료되었습니다")
+        console_print(streamer + " finished streaming")
         repeat_check = True
     else:
         if repeat_check:
-            console_print("방송 시작 대기중")
+            console_print("Waiting for " + streamer + " to start streaming")
             repeat_check = False
 
     time.sleep(5) # 5초동안 쉬고 다시 체크
