@@ -11,6 +11,7 @@ from datetime import datetime
 from PyQt5.QtWidgets import (QApplication, QWidget, QTextBrowser, QGridLayout, QGroupBox, QLabel, QMessageBox, QRadioButton)
 import PyQt5.QtWidgets as qtwid
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 
 client_id = "5ayor8kn22hxinl6way2j1ejzi41g2"
 client_secret = "8tp18ssnpzbrzyyf0he83q3lsfayyx"
@@ -34,6 +35,7 @@ class MyApp(QWidget):
 
         self.setLayout(grid)
 
+        self.setWindowIcon(QIcon('logo.png'))
         self.setWindowTitle('트위치 자동 녹화기 ' + now_version)
         self.resize(600, 400)
         self.show()
