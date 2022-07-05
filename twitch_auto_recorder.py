@@ -35,7 +35,7 @@ class MyApp(QWidget):
 
         self.setLayout(grid)
 
-        self.setWindowIcon(QIcon('logo.png'))
+        # self.setWindowIcon(QIcon('resource/logo.png'))
         self.setWindowTitle('트위치 자동 녹화기 ' + now_version)
         self.resize(600, 400)
         self.show()
