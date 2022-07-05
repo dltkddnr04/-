@@ -15,6 +15,8 @@ from PyQt5.QtCore import Qt
 client_id = "5ayor8kn22hxinl6way2j1ejzi41g2"
 client_secret = "8tp18ssnpzbrzyyf0he83q3lsfayyx"
 
+now_version = "1.1.0"
+
 # streamer_list.pikle 파일이 없으면 생성
 if not os.path.isfile("streamer_list.pickle"):
     with open("streamer_list.pickle", "wb") as f:
@@ -32,7 +34,7 @@ class MyApp(QWidget):
 
         self.setLayout(grid)
 
-        self.setWindowTitle('트위치 자동 녹화기')
+        self.setWindowTitle('트위치 자동 녹화기 ' + now_version)
         self.resize(600, 400)
         self.show()
 
@@ -169,12 +171,11 @@ class MyApp(QWidget):
     def update_check(self):
         # 업데이트 확인 코드
         try:
-            now_version = "1.1.0"
             req = requests.get("https://api.github.com/repos/dltkddnr04/Twitch-Auto-Recorder/releases/latest")
             json_data = json.loads(req.text)
             latest_version = json_data["name"].replace("v", "")
             if latest_version != now_version:
-                QMessageBox.information(self, "업데이트 알림", "새로운 버전이 사용가능합니다.\n업데이트해주세요.\n업데이트 주소:\nhttps://github.com/dltkddnr04/Twitch-Auto-Recorder/releases")
+                QMessageBox.information(self, "업데이트 알림", "현재 " + latest_version + " 버전이 사용가능합니다.\n업데이트 주소:\nhttps://github.com/dltkddnr04/Twitch-Auto-Recorder/releases")
 
         except:
             QMessageBox.information(self, "Error", "인터넷에 연결되어있지 않습니다.\n인터넷 연결을 확인해주세요.")
