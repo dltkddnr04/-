@@ -2,7 +2,6 @@ import requests
 import json
 import subprocess
 import time
-import platform
 from datetime import datetime
 
 client_id = "" # 트위치에서 발급한 클라이언트 아이디 키
