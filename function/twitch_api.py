@@ -67,11 +67,13 @@ def using_pagination(url):
     return list
 
 def get_follow_data(user_id):
+    # 이 함수는 유저가 팔로우하는 사람의 목록입니다
     url = 'https://api.twitch.tv/helix/users/follows?from_id=' + user_id + '&first=100'
     follow_data = using_pagination(url)
     return follow_data
 
 def get_follower_data(user_id):
+    # 이 함수는 유저를 팔로우하는 사람의 목록입니다
     url = 'https://api.twitch.tv/helix/users/follows?to_id=' + user_id + '&first=100'
     follower_data = using_pagination(url)
     return follower_data

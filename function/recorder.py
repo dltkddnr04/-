@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import streamlink
 import ffmpeg
 import subprocess

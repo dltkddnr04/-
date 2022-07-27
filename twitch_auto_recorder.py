@@ -13,9 +13,6 @@ import PyQt5.QtWidgets as qtwid
 from PyQt5.QtCore import Qt
 from function import (twitch_api, update, recorder)
 
-client_id = "5ayor8kn22hxinl6way2j1ejzi41g2"
-client_secret = "8tp18ssnpzbrzyyf0he83q3lsfayyx"
-
 current_version = "1.1.0"
 
 # streamer_list.pikle 파일이 없으면 생성
@@ -41,8 +38,10 @@ class MyApp(QWidget):
         self.show()
 
         try:
-            self.access_token = twitch_api.get_access_token(client_id, client_secret)
-            twitch_api.get_header(self.access_token)
+            client_id = "5ayor8kn22hxinl6way2j1ejzi41g2"
+            client_secret = "8tp18ssnpzbrzyyf0he83q3lsfayyx"
+            access_token = twitch_api.get_access_token(client_id, client_secret)
+            twitch_api.get_header(client_id, access_token)
 
         except:
             QMessageBox.information(self, "Error", "인터넷에 연결되어있지 않습니다.\n인터넷 연결을 확인해주세요.")
@@ -118,19 +117,6 @@ class MyApp(QWidget):
     def console_print(self, message):
         date = "[" + datetime.today().strftime('%Y-%m-%d %H:%M:%S') + "]"
         self.tb.append(date + " " + message)
-
-    def stream_check(self, streamer_id):
-        headers = {'Client-ID': client_id, 'Authorization': 'Bearer ' + self.access_token}
-        req = requests.get("https://api.twitch.tv/helix/streams?user_id=" + streamer_id, headers=headers)
-    
-        json_data = json.loads(req.text)
-        #print(json_data)
-        stream_status = json_data["data"]
-
-        if not stream_status:
-            return False
-        else:
-            return True
         
     def stream_record(self, streamer, streamer_id):
         if streamer_id == None:
@@ -138,7 +124,7 @@ class MyApp(QWidget):
             json_data = json.loads(req.text)
             streamer_id = json_data["data"][0]["id"]
         while True:
-            if self.stream_check(streamer_id):
+            if twitch_api.get_stream_data(streamer_id):
                 self.console_print(streamer + "님 방송 녹화 시작")
                 recorder.download_stream_legacy(streamer)
                 self.console_print(streamer + "님 방송 녹화 종료")
@@ -185,10 +171,7 @@ class MyApp(QWidget):
             # 경고창으로 물어보기
             if QMessageBox.question(self, "Warning", "기존의 모든 스트리머가 등록해제됩니다.\n 계속하시겠습니까?", QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
                 user = self.streamer_edit.text()
-                req = requests.get("https://api.twitch.tv/helix/users?login=" + user, headers={"Client-ID": client_id, "Authorization": "Bearer " + self.access_token})
-                json_data = json.loads(req.text)
-
-                if len(json_data["data"]) == 0:
+                if not twitch_api.check_user_exists(user):
                     QMessageBox.information(self, "Error", "존재하지 않는 유저입니다.")
                 else:
                     # lbox_item 전부 삭제하기
@@ -203,19 +186,13 @@ class MyApp(QWidget):
 
                     self.console_print("전체 스트리머 등록 해제 완료")
 
-                    user_id = json_data["data"][0]["id"]
+                    user_id = twitch_api.get_id_from_login(user)
 
-                    req = requests.get("https://api.twitch.tv/helix/users/follows?from_id=" + user_id + "&first=100", headers={"Client-ID": client_id, "Authorization": "Bearer " + self.access_token})
-                    json_data = json.loads(req.text)
-
-                    follow_list = []
+                    follow_list = twitch_api.get_follow_data(user_id)
                     # follow_list에 스트리머 닉네임과 아이디 저장
-                    for i in range(len(json_data["data"])):
-                        follow_list.append([json_data["data"][i]["to_login"], json_data["data"][i]["to_id"]])
-
                     for streamer in follow_list:
-                        if not self.lbox_item.findItems(streamer[0], Qt.MatchExactly):
-                            self.add_streamer(streamer[0], streamer[1])
+                        if not self.lbox_item.findItems(streamer['to_login'], Qt.MatchExactly):
+                            self.add_streamer(streamer['to_login'], streamer['to_id'])
 
                     if not follow_list:
                         self.console_print("팔로우한 스트리머가 없습니다.")
@@ -229,15 +206,12 @@ class MyApp(QWidget):
 
     def add_streamer(self, streamer, streamer_id):
         if streamer_id == None:
-            req = requests.get("https://api.twitch.tv/helix/users?login=" + streamer, headers={"Client-ID": client_id, "Authorization": "Bearer " + self.access_token})
-            json_data = json.loads(req.text)
-
-            if len(json_data["data"]) == 0:
+            if not twitch_api.check_user_exists(streamer):
                 QMessageBox.information(self, "Error", "존재하지 않는 스트리머입니다.")
                 return
             else:
                 self.streamer_edit.setText("")
-                streamer_id = json_data["data"][0]["id"]
+                streamer_id = twitch_api.get_id_from_login(streamer)
 
         
         self.lbox_item.addItem(streamer)
