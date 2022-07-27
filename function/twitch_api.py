@@ -80,3 +80,21 @@ def get_clip_list(user_id, start_time, end_time):
     url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + user_id + '&first=100&started_at=' + start_time + '&ended_at=' + end_time
     clip_list = using_pagination(url)
     return clip_list
+
+def get_chat_from_vod(vod_id):
+    list = []
+    v5_client_id = 'jzkbprff40iqj646a697cyrvl0zt2m6'
+    url = 'https://api.twitch.tv/v5/videos/' + vod_id + '/comments'
+    req = requests.get(url, params={"client_id": v5_client_id})
+    json_data = json.loads(req.text)
+    list.extend(json_data["comments"])
+    while json_data["_next"]:
+        try:
+            next_url = url + '?cursor=' + json_data['_next']
+            req = requests.get(next_url, params={"client_id": v5_client_id})
+            json_data = json.loads(req.text)
+            list.extend(json_data["comments"])
+            print(json_data["_next"])
+        except:
+            break
+    return list

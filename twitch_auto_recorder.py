@@ -11,12 +11,12 @@ from datetime import datetime
 from PyQt5.QtWidgets import (QApplication, QWidget, QTextBrowser, QGridLayout, QGroupBox, QLabel, QMessageBox, QRadioButton)
 import PyQt5.QtWidgets as qtwid
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from function import (twitch_api, update, recorder)
 
 client_id = "5ayor8kn22hxinl6way2j1ejzi41g2"
 client_secret = "8tp18ssnpzbrzyyf0he83q3lsfayyx"
 
-now_version = "1.1.0"
+current_version = "1.1.0"
 
 # streamer_list.pikle 파일이 없으면 생성
 if not os.path.isfile("streamer_list.pickle"):
@@ -36,14 +36,13 @@ class MyApp(QWidget):
         self.setLayout(grid)
 
         # self.setWindowIcon(QIcon('resource/logo.png'))
-        self.setWindowTitle('트위치 자동 녹화기 ' + now_version)
+        self.setWindowTitle('트위치 자동 녹화기 ' + current_version)
         self.resize(600, 400)
         self.show()
 
         try:
-            req = requests.post("https://id.twitch.tv/oauth2/token?client_id=" + client_id + "&client_secret=" + client_secret + "&grant_type=client_credentials")
-            json_data = json.loads(req.text)
-            self.access_token = json_data["access_token"]
+            self.access_token = twitch_api.get_access_token(client_id, client_secret)
+            twitch_api.get_header(self.access_token)
 
         except:
             QMessageBox.information(self, "Error", "인터넷에 연결되어있지 않습니다.\n인터넷 연결을 확인해주세요.")
@@ -132,16 +131,6 @@ class MyApp(QWidget):
             return False
         else:
             return True
-
-    def stream_download(self, streamer):
-        date = datetime.today().strftime('%Y-%m-%d %H-%M-%S')
-        path = "./" + streamer + "/" + date + ".ts"
-    
-        if platform.system() == "Windows":
-            CREATE_NO_WINDOW = 0x08000000
-            subprocess.run(["streamlink", "twitch.tv/" + streamer, "best", "-o", path], creationflags=CREATE_NO_WINDOW)
-        else:
-            subprocess.run(["streamlink", "twitch.tv/" + streamer, "best", "-o", path])
         
     def stream_record(self, streamer, streamer_id):
         if streamer_id == None:
@@ -151,7 +140,7 @@ class MyApp(QWidget):
         while True:
             if self.stream_check(streamer_id):
                 self.console_print(streamer + "님 방송 녹화 시작")
-                self.stream_download(streamer)
+                recorder.download_stream_legacy(streamer)
                 self.console_print(streamer + "님 방송 녹화 종료")
             if not self.lbox_item.findItems(streamer, Qt.MatchExactly):
                 break
@@ -173,10 +162,8 @@ class MyApp(QWidget):
     def update_check(self):
         # 업데이트 확인 코드
         try:
-            req = requests.get("https://api.github.com/repos/dltkddnr04/Twitch-Auto-Recorder/releases/latest")
-            json_data = json.loads(req.text)
-            latest_version = json_data["name"].replace("v", "")
-            if latest_version != now_version:
+            latest_version = update.get_latest_version()
+            if update.compare_version(current_version, latest_version):
                 QMessageBox.information(self, "업데이트 알림", "현재 " + latest_version + " 버전이 사용가능합니다.\n업데이트 주소:\nhttps://github.com/dltkddnr04/Twitch-Auto-Recorder/releases")
 
         except:
