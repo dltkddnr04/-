@@ -1,12 +1,10 @@
 import requests
 import json
-import subprocess
 import time
 import sys
 import threading
 import pickle
 import os
-import platform
 from datetime import datetime
 from PyQt5.QtWidgets import (QApplication, QWidget, QTextBrowser, QGridLayout, QGroupBox, QLabel, QMessageBox, QRadioButton)
 import PyQt5.QtWidgets as qtwid
@@ -120,9 +118,7 @@ class MyApp(QWidget):
         
     def stream_record(self, streamer, streamer_id):
         if streamer_id == None:
-            req = requests.get("https://api.twitch.tv/helix/users?login=" + streamer, headers={"Client-ID": client_id, "Authorization": "Bearer " + self.access_token})
-            json_data = json.loads(req.text)
-            streamer_id = json_data["data"][0]["id"]
+            streamer_id = twitch_api.get_id_from_login(streamer)
         while True:
             if twitch_api.get_stream_data(streamer_id):
                 self.console_print(streamer + "님 방송 녹화 시작")
