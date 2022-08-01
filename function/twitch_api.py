@@ -88,6 +88,11 @@ def get_schedule_data(user_id, start_time):
     schedule_data = using_pagination(url)
     return schedule_data
 
+def get_vod_data(user_id, period):
+    url = 'https://api.twitch.tv/helix/videos?user_id=' + user_id + '&period=' + period + '&first=100&type=archive'
+    vod_data = using_pagination(url)
+    return vod_data
+
 
 def get_chat_from_vod(vod_id):
     list = []
