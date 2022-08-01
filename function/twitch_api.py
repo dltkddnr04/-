@@ -83,6 +83,12 @@ def get_clip_list(user_id, start_time, end_time):
     clip_list = using_pagination(url)
     return clip_list
 
+def get_schedule_data(user_id, start_time):
+    url = 'https://api.twitch.tv/helix/schedule?broadcaster_id=' + user_id + '&started_at=' + start_time + '&first=25'
+    schedule_data = using_pagination(url)
+    return schedule_data
+
+
 def get_chat_from_vod(vod_id):
     list = []
     v5_client_id = 'jzkbprff40iqj646a697cyrvl0zt2m6'
