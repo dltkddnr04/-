@@ -1,17 +1,17 @@
 from datetime import datetime
 import streamlink
-import ffmpeg
 import subprocess
 import platform
+import ffmpeg
 
-def basic_file_info(user_login):
+def basic_file_info(user_login, extension):
     date = datetime.today().strftime('%Y-%m-%d %H-%M-%S')
-    path = './' + user_login + '/' + date + '.ts'
+    path = './' + user_login + '/' + date + '.' + extension
     return path
 
 
-def download_stream_legacy(user_login):
-    path = basic_file_info(user_login)
+def download_stream_legacy(user_login, extension):
+    path = basic_file_info(user_login, extension)
     stream_url = 'twitch.tv/' + user_login
 
     if platform.system() == "Windows":
@@ -21,6 +21,7 @@ def download_stream_legacy(user_login):
         subprocess.run(["streamlink", stream_url, "best", "-o", path])
     return
 
+'''
 def get_stream_m3u8(user_login):
     stream_url = "https://www.twitch.tv/" + user_login
     stream_m3u8 = streamlink.streams(stream_url)["best"].url
@@ -31,3 +32,4 @@ def download_stream_ffmpeg(user_login):
     stream_m3u8 = get_stream_m3u8(user_login)
     ffmpeg.input(stream_m3u8).output(path).run()
     return
+'''

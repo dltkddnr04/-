@@ -11,7 +11,7 @@ import PyQt5.QtWidgets as qtwid
 from PyQt5.QtCore import Qt
 from function import (twitch_api, update, recorder)
 
-current_version = "1.1.0"
+current_version = "1.2.0"
 
 # streamer_list.pikle 파일이 없으면 생성
 if not os.path.isfile("streamer_list.pickle"):
@@ -20,8 +20,17 @@ if not os.path.isfile("streamer_list.pickle"):
 
 class MyApp(QWidget):
     def __init__(self):
+        if not os.path.isfile("setup.pickle"):
+            extension = 'ts'
+            with open("setup.pickle", "wb") as f:
+                pickle.dump(extension, f)
+
+        with open("setup.pickle", "rb") as f:
+            self.extension = pickle.load(f)
         super().__init__()
         self.initUI()
+
+        QMessageBox.information(self, "경고", "ts 이외의 파일형식을 사용할경우 녹화가 중간에 중단될시 파일이 유실될 수 있습니다.\n컴퓨터나 프로그램이 강제로 종료될 가능성이 있는경우 ts 파일로 녹화한 후에 인코딩하는것을 추천합니다.")
 
     def initUI(self):
         grid = QGridLayout()
@@ -59,12 +68,17 @@ class MyApp(QWidget):
         self.streamer_edit.setToolTip('스트리머의 영문 닉네임을 입력하세요')
         self.title_label = QLabel("스트리머 영문 닉네임")
 
-        grid.addWidget(self.radio_group(), 0, 0, 1, 2)
-        grid.addWidget(self.title_label, 1, 0)
-        grid.addWidget(self.streamer_edit, 2, 0)
-        grid.addWidget(self.save_btn, 2, 1)
-        grid.addWidget(self.lbox_item, 3, 0)
-        grid.addWidget(self.btn_group(), 3, 1)
+        #grid.addWidget(self.radio_group(), 1, 0, 1, 2)
+        #grid.addWidget(self.extension_radio_group(), 0, 0, 1, 2)
+
+        grid.addWidget(self.radio_group(), 0, 0, )
+        grid.addWidget(self.extension_radio_group(), 0, 1)
+
+        grid.addWidget(self.title_label, 2, 0)
+        grid.addWidget(self.streamer_edit, 3, 0)
+        grid.addWidget(self.save_btn, 3, 1)
+        grid.addWidget(self.lbox_item, 4, 0)
+        grid.addWidget(self.btn_group(), 4, 1)
 
         self.save_btn.clicked.connect(self.Btn_addClick)        
         self.lbox_item.itemSelectionChanged.connect(self.Lbox_itemSelectionChange)
@@ -101,6 +115,32 @@ class MyApp(QWidget):
         groupbox.setLayout(grid)
         return groupbox
 
+    def extension_radio_group(self):
+        groupbox = QGroupBox()
+        grid = QGridLayout()
+
+        self.extension_radio_option1 = QRadioButton('ts', self)
+        self.extension_radio_option2 = QRadioButton('mp4', self)
+        self.extension_radio_option3 = QRadioButton('mkv', self)
+
+        grid.addWidget(self.extension_radio_option1, 0, 0)
+        grid.addWidget(self.extension_radio_option2, 1, 0)
+        grid.addWidget(self.extension_radio_option3, 2, 0)
+
+        if self.extension == 'ts':
+            self.extension_radio_option1.setChecked(True)
+        elif self.extension == 'mp4':
+            self.extension_radio_option2.setChecked(True)
+        elif self.extension == 'mkv':
+            self.extension_radio_option3.setChecked(True)
+        
+        self.extension_radio_option1.clicked.connect(self.extension_ts)
+        self.extension_radio_option2.clicked.connect(self.extension_mp4)
+        self.extension_radio_option3.clicked.connect(self.extension_mkv)
+
+        groupbox.setLayout(grid)
+        return groupbox
+
     def createTerminalGroup(self):
         groupbox = QGroupBox('로그')
         grid = QGridLayout()
@@ -122,7 +162,7 @@ class MyApp(QWidget):
         while True:
             if twitch_api.get_stream_data(streamer_id):
                 self.console_print(streamer + "님 방송 녹화 시작")
-                recorder.download_stream_legacy(streamer)
+                recorder.download_stream_legacy(streamer, self.extension)
                 self.console_print(streamer + "님 방송 녹화 종료")
             if not self.lbox_item.findItems(streamer, Qt.MatchExactly):
                 break
@@ -253,9 +293,29 @@ class MyApp(QWidget):
 
     def maunal_mode(self):
         self.title_label.setText("스트리머 영문 닉네임")
+        return
 
     def automatic_mode(self):
         self.title_label.setText("본인의 영문 닉네임")
+        return
+
+    def extension_ts(self):
+        self.extension = 'ts'
+        with open("setup.pickle", 'wb') as f:
+            pickle.dump(self.extension, f)
+        return
+
+    def extension_mp4(self):
+        self.extension = 'mp4'
+        with open("setup.pickle", 'wb') as f:
+            pickle.dump(self.extension, f)
+        return
+
+    def extension_mkv(self):
+        self.extension = 'mkv'
+        with open("setup.pickle", 'wb') as f:
+            pickle.dump(self.extension, f)
+        return
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
