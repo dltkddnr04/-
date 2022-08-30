@@ -51,7 +51,7 @@ class MyApp(QWidget):
             twitch_api.get_header(client_id, access_token)
 
         except:
-            QMessageBox.information(self, "Error", "인터넷에 연결되어있지 않습니다.\n인터넷 연결을 확인해주세요.")
+            QMessageBox.information(self, "경고", "인터넷에 연결되어있지 않습니다.\n인터넷 연결을 확인해주세요.")
             exit()
 
         self.update_check()
@@ -189,16 +189,16 @@ class MyApp(QWidget):
                 QMessageBox.information(self, "업데이트 알림", "현재 " + latest_version + " 버전이 사용가능합니다.\n업데이트 주소:\nhttps://github.com/dltkddnr04/Twitch-Auto-Recorder/releases")
 
         except:
-            QMessageBox.information(self, "Error", "인터넷에 연결되어있지 않습니다.\n인터넷 연결을 확인해주세요.")
+            QMessageBox.information(self, "경고", "인터넷에 연결되어있지 않습니다.\n인터넷 연결을 확인해주세요.")
 
     def Btn_addClick(self):
         streamer = self.streamer_edit.text()
         if streamer == "":
-            QMessageBox.information(self, "Error", "이름이 비어있습니다.")
+            QMessageBox.information(self, "경고", "이름이 비어있습니다.")
 
         if self.radio_option1.isChecked():
             if self.lbox_item.findItems(streamer, Qt.MatchExactly):
-                QMessageBox.information(self, "Error", "이미 등록된 스트리머입니다.")
+                QMessageBox.information(self, "경고", "이미 등록된 스트리머입니다.")
                 self.streamer_edit.setText("")
             else:
                 self.add_streamer(streamer, None)
@@ -208,7 +208,7 @@ class MyApp(QWidget):
             if QMessageBox.question(self, "Warning", "기존의 모든 스트리머가 등록해제됩니다.\n 계속하시겠습니까?", QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
                 user = self.streamer_edit.text()
                 if not twitch_api.check_user_exists(user):
-                    QMessageBox.information(self, "Error", "존재하지 않는 유저입니다.")
+                    QMessageBox.information(self, "경고", "존재하지 않는 유저입니다.")
                 else:
                     # lbox_item 전부 삭제하기
                     for i in range(self.lbox_item.count()):
@@ -235,7 +235,7 @@ class MyApp(QWidget):
                     else:
                         self.console_print("팔로우한 스트리머 등록 완료")
             else:
-                QMessageBox.information(self, "Error", "취소되었습니다.")
+                QMessageBox.information(self, "경고", "취소되었습니다.")
             
             self.radio_option1.setChecked(True)
         return
@@ -243,7 +243,7 @@ class MyApp(QWidget):
     def add_streamer(self, streamer, streamer_id):
         if streamer_id == None:
             if not twitch_api.check_user_exists(streamer):
-                QMessageBox.information(self, "Error", "존재하지 않는 스트리머입니다.")
+                QMessageBox.information(self, "경고", "존재하지 않는 스트리머입니다.")
                 return
             else:
                 self.streamer_edit.setText("")
