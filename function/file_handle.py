@@ -3,6 +3,28 @@ import threading
 
 run_queue = []
 
+def make_setting_file():
+    setting_file = open('setting.json', 'w')
+    setting_data = {
+        "account": {
+            "client_id": "5ayor8kn22hxinl6way2j1ejzi41g2",
+            "client_secret": "8tp18ssnpzbrzyyf0he83q3lsfayyx",
+            "access_token": ""
+        },
+        "setting": {
+            "download_mode": "",
+            "download_path": "",
+            "video_type": ""
+        },
+        "user_data_list": {
+            "download_live_stream": {
+
+            }
+        }
+    }
+    setting_file.write(json.dumps(setting_data))
+    setting_file.close()
+
 def read_file(file_path):
     file = open(file_path, 'r')
     data = file.read()

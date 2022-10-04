@@ -162,7 +162,7 @@ class MyApp(QWidget):
         while True:
             if twitch_api.get_stream_data(streamer_id):
                 self.console_print(streamer + "님 방송 녹화 시작")
-                recorder.download_stream_legacy(streamer, self.extension)
+                recorder.download_stream_m3u8_legacy(streamer, self.extension)
                 self.console_print(streamer + "님 방송 녹화 종료")
             if not self.lbox_item.findItems(streamer, Qt.MatchExactly):
                 break
