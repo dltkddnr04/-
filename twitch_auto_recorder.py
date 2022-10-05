@@ -11,7 +11,7 @@ import PyQt5.QtWidgets as qtwid
 from PyQt5.QtCore import Qt
 from function import (twitch_api, update, recorder)
 
-current_version = "1.2.0"
+current_version = "1.3.0"
 
 # streamer_list.pikle 파일이 없으면 생성
 if not os.path.isfile("streamer_list.pickle"):
