@@ -5,11 +5,7 @@ import time
 from datetime import datetime
 from function import (twitch_api, recorder)
 
-client_id = "5ayor8kn22hxinl6way2j1ejzi41g2" # 트위치에서 발급한 클라이언트 아이디 키
-client_secret = "8tp18ssnpzbrzyyf0he83q3lsfayyx" # 트위치에서 발급한 클라이언트 시크릿 키
-
-access_token = twitch_api.get_access_token(client_id, client_secret)
-twitch_api.get_header(client_id, access_token)
+twitch_api.get_header_online()
 
 repeat_check = True
 

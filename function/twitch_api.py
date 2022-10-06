@@ -12,6 +12,13 @@ def get_header(client_id, access_token):
     headers = {'Client-ID': client_id, 'Authorization': 'Bearer ' + access_token}
     return headers
 
+def get_header_online():
+    url = "https://get-header.twitch-auto-recorder.workers.dev"
+    req = requests.get(url)
+    global headers
+    headers = json.loads(req.text)
+    return headers
+
 def check_user_exists(user_iden):
     if user_iden.isdigit() and len(user_iden) == 9:
         url = 'https://api.twitch.tv/helix/users?id='

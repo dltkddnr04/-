@@ -45,10 +45,7 @@ class MyApp(QWidget):
         self.show()
 
         try:
-            client_id = "5ayor8kn22hxinl6way2j1ejzi41g2"
-            client_secret = "8tp18ssnpzbrzyyf0he83q3lsfayyx"
-            access_token = twitch_api.get_access_token(client_id, client_secret)
-            twitch_api.get_header(client_id, access_token)
+            twitch_api.get_header_online()
 
         except:
             QMessageBox.information(self, "경고", "인터넷에 연결되어있지 않습니다.\n인터넷 연결을 확인해주세요.")
