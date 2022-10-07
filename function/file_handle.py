@@ -4,12 +4,9 @@ import threading
 run_queue = []
 
 def make_setting_file():
-    setting_file = open('setting.json', 'w')
+    setting_file = open('test_setting.json', 'w')
     setting_data = {
         "account": {
-            "client_id": "5ayor8kn22hxinl6way2j1ejzi41g2",
-            "client_secret": "8tp18ssnpzbrzyyf0he83q3lsfayyx",
-            "access_token": ""
         },
         "setting": {
             "download_mode": "",
@@ -22,58 +19,62 @@ def make_setting_file():
             }
         }
     }
-    setting_file.write(json.dumps(setting_data))
+    setting_file.write(json.dumps(setting_data, indent=4))
     setting_file.close()
 
-def read_file(file_path):
-    file = open(file_path, 'r')
-    data = file.read()
-    file.close()
-    return data
+def read_setting_file():
+    setting_file = open('test_setting.json', 'r')
+    setting_data = json.loads(setting_file.read())
+    setting_file.close()
+    return setting_data
 
-def write_file(file_path, data):
-    file = open(file_path, 'w')
-    file.write(data)
-    file.close()
-    return
+def write_setting_file(setting_data):
+    setting_file = open('test_setting.json', 'w')
+    setting_file.write(json.dumps(setting_data, indent=4))
+    setting_file.close()
 
-def add_queue(file_path, key, data):
-    run_queue.append({'path': file_path, 'key': key, 'data': data})
-    return
-
-def check_key_exist(dict, key):
+def check_key_exist(setting_data, key):
     key_value = key.split('/')
 
-    if key_value[0] in dict:
-        if key_value[1] in dict[key_value[0]]:
+    if key_value[0] in setting_data:
+        if key_value[1] in setting_data[key_value[0]]:
             return True
         else:
             return False
     else:
         return False
 
-def execute_queue(file_path, key, data):
-    file_data = read_file(file_path)
-    json_data = json.loads(file_data)
-    
-    if check_key_exist(json_data, key):
-        key_value = key.split('/')
-        json_data[key_value[0]][key_value[1]] = data
+def add_queue(key, data):
+    run_queue.append([key, data])
+    return
 
-        write_file(file_path, json.dumps(json_data))
+def execute_queue(key, data):
+    setting_json = read_setting_file()
+    key_value = key.split('/')
+    if check_key_exist(setting_json, key):
+        setting_json[key_value[0]][key_value[1]] = data
+        write_setting_file(setting_json)
         return True
     else:
         return False
 
-def loop_queue():
+def main():
     while True:
         if len(run_queue) > 0:
-            query = run_queue[0]
-            execute_queue(query['path'], query['key'], query['data'])
-            run_queue.remove(query)
+            key = run_queue[0][0]
+            data = run_queue[0][1]
+            if not execute_queue(key, data):
+                print('Error: Key not exist')
+            run_queue.pop(0)
         else:
             pass
 
-# here is function test code
-# threading.Thread(target=loop_queue).start()
-# add_queue('setting_test.json', 'account/access_token', 'sexyguy')
+# test code
+try:
+    open('test_setting.json', 'r')
+except FileNotFoundError:
+    make_setting_file()
+
+threading.Thread(target=main).start()
+
+add_queue('account/username', 'test')
