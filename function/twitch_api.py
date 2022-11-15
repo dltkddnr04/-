@@ -48,11 +48,11 @@ def get_stream_data(user_id):
     url = 'https://api.twitch.tv/helix/streams?user_id=' + user_id
     req = requests.get(url, headers=headers)
     json_data = json.loads(req.text)
-    stream_data = json_data["data"][0]
-    if not stream_data:
-        return False
-    else:
+    try:
+        stream_data = json_data["data"][0]
         return stream_data
+    except IndexError:
+        return False
 
 def get_clip_data(clip_id):
     url = 'https://api.twitch.tv/helix/clips?id=' + clip_id

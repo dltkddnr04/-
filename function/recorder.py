@@ -33,9 +33,9 @@ def download_stream_m3u8_legacy(user_login, extension):
 
     if platform.system() == "Windows":
         CREATE_NO_WINDOW = 0x08000000
-        subprocess.run(["streamlink", stream_m3u8, "-o", path], creationflags=CREATE_NO_WINDOW)
+        subprocess.run(["streamlink", stream_m3u8, "best", "-o", path], creationflags=CREATE_NO_WINDOW)
     else:
-        subprocess.run(["streamlink", stream_m3u8, "-o", path])
+        subprocess.run(["streamlink", stream_m3u8, "best", "-o", path])
     return
 
 def get_stream_m3u8(user_login):

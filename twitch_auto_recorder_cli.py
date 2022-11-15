@@ -18,14 +18,14 @@ def console_print(message):
 console_print("Program started")
 
 while True:
-    if twitch_api.get_stream_data(user_id):
-        console_print(user_login + " start streaming")
-        recorder.download_stream_legacy(user_login)
-        console_print(user_login + " finished streaming")
+    stream_data = twitch_api.get_stream_data(user_id)
+    if stream_data is not False:
+        console_print("Stream started")
+        recorder.download_stream_m3u8_legacy(user_login, 'ts')
+        console_print("Stream ended")
         repeat_check = True
     else:
         if repeat_check:
-            console_print("Waiting for " + user_login + " to start streaming")
+            console_print("Waiting for {} to start streaming".format(user_login))
             repeat_check = False
-
-    time.sleep(5) # 5초동안 쉬고 다시 체크
+        time.sleep(5)
