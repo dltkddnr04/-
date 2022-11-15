@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 # 내부적으로 필요한 함수이기는 한데 별도 파일로 분리하기에는 애매한 function들을 모아놓은 파일이다.
 
@@ -16,3 +16,7 @@ def timezone_shift(date, original_zone, convert_zone):
 
         date = date.strftime('%Y-%m-%dT%H:%M:%S')
         return date
+
+def console_print(message):
+    time = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    print("[{}] {}".format(time, message))
