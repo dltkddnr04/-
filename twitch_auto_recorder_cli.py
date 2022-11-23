@@ -1,12 +1,18 @@
 from function import (function, twitch_api, recorder)
 from datetime import datetime
 import time
+import sys
 
 twitch_api.get_header_online()
 
 repeat_check = True
 
-user_login = "zomul_e" # 자동 다운로드 하고싶은 스트리머의 영문 닉네임을 입력해준다.
+# user_login = "zomul_e"
+try:
+    user_login = sys.argv[1]
+except:
+    print("streamer nickname is not exist")
+    exit()
 user_id = twitch_api.get_id_from_login(user_login)
 
 function.console_print("Program started")
