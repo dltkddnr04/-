@@ -29,7 +29,10 @@ def download_stream_m3u8_legacy(user_login, extension):
     for key, value in stream_m3u8.items():
         stream_m3u8_list.append(value)
     
-    stream_m3u8 = stream_m3u8_list[0]
+    try:
+        stream_m3u8 = stream_m3u8_list[0]
+    except:
+        return
 
     if platform.system() == "Windows":
         CREATE_NO_WINDOW = 0x08000000
