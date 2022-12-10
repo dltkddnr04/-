@@ -30,9 +30,6 @@ data = {
 req = requests.post(url, headers=header, json=data)
 result = req.text
 
-print(result)
-exit()
-
 sig = json.loads(result)['data']['streamPlaybackAccessToken']['signature']
 token = json.loads(result)['data']['streamPlaybackAccessToken']['value']
 
