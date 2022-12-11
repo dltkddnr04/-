@@ -2,7 +2,7 @@ import requests
 import json
 import random
 
-streamer = "nangodof"
+streamer = "ryung971219"
 
 url = "https://gql.twitch.tv/gql#origin=twilight"
 
