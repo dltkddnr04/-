@@ -5,22 +5,25 @@ import json
 import threading
 import time
 import os
+import hashlib
 
-def clip_download_threading(url):
-    clip_count_in_thread = clip_count - len(clip_link_list)
-    clip_link_list.remove(url)
+def clip_download_threading(clip_data):
+    clip_link = clip_data["thumbnail_url"].split("-preview-")[0] + ".mp4"
 
-    file_name = url.split("/")[-1]
+    clip_count_in_thread = clip_count - len(clip_list)
+    clip_list.remove(clip_data)
+
+    file_name = clip_data["hash_id"] + ".mp4"
     file_dir = "clips/{}/{}".format(user_login, file_name)
     try:
-        req = requests.get(url, stream=True)
+        req = requests.get(clip_link, stream=True)
         with open(file_dir, "wb") as f:
             for chunk in req.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
         function.console_print("Download Complete: {} ({}/{})".format(file_name, clip_count_in_thread, clip_count))
     except:
-        clip_link_list.append(url)
+        clip_list.append(clip_data)
 
 twitch_api.get_header_online()
 
@@ -47,32 +50,32 @@ clip_count = len(clip_list)
 
 function.console_print("Clip Count: {}".format(clip_count))
 
+for clip_data in clip_list:
+    hash_raw = clip_data["broadcaster_name"] + clip_data["created_at"]
+    # hash to sha256
+    hash_id = hashlib.sha256(hash_raw.encode()).hexdigest()
+    clip_data["hash_id"] = hash_id
+
 # 클립 정보를 json 파일로 저장
-clip_list = json.loads(clip_list)
+# clip_list = json.loads(clip_list)
 with open("clips/{}_clip_list.json".format(user_login), "w") as f:
     f.write(json.dumps(clip_list, indent=4))
 
 function.console_print("Clip List Save Complete: clips/{}_clip_list.json".format(user_login))
 
-# 클립 정보에서 다운로드 링크를 추출
-clip_link_list = []
-for clip in clip_list:
-    clip_link = clip["thumbnail_url"].split("-preview-")[0] + ".mp4"
-    clip_link_list.append(clip_link)
-
 # 파일 다운로드
-while len(clip_link_list) > 0:
-    while threading.active_count() > 20:
+while len(clip_list) > 0:
+    while threading.active_count() > 10:
         time.sleep(0.1)
-    threading.Thread(target=clip_download_threading, args=(clip_link_list[0],)).start()
+    threading.Thread(target=clip_download_threading, args=(clip_list[0],)).start()
 
 # check file number and compare with clip count
 file_list = os.listdir("clips/{}".format(user_login))
 if len(file_list) != clip_count:
     function.console_print("some files are not downloaded. program will be retry to download.")
-    while len(clip_link_list) > 0:
+    while len(clip_list) > 0:
         # manual download
-        for clip_link in clip_link_list:
+        for clip_link in clip_list:
             clip_download_threading(clip_link)
         
 function.console_print("{} clips are successfully downloaded".format(len(file_list)))

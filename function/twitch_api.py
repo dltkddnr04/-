@@ -1,6 +1,9 @@
 import requests
 import json
 
+BASIC_URL = 'https://api.twitch.tv/helix/'
+# BASIC_URL = 'https://twitchapibypass.twitch-auto-recorder.workers.dev/'
+
 def get_access_token(client_id, client_secret):
     url = 'https://id.twitch.tv/oauth2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=client_credentials'
     req = requests.post(url)
@@ -21,9 +24,9 @@ def get_header_online():
 
 def check_user_exists(user_iden):
     if user_iden.isdigit() and len(user_iden) == 9:
-        url = 'https://api.twitch.tv/helix/users?id='
+        url = BASIC_URL + 'users?id='
     else:
-        url = 'https://api.twitch.tv/helix/users?login='
+        url = BASIC_URL + 'users?login='
 
     req = requests.get(url + user_iden, headers=headers)
     json_data = json.loads(req.text)
@@ -33,19 +36,19 @@ def check_user_exists(user_iden):
         return False
 
 def get_id_from_login(user_login):
-    url = 'https://api.twitch.tv/helix/users?login=' + user_login
+    url = BASIC_URL + 'users?login=' + user_login
     req = requests.get(url, headers=headers)
     user_id = req.json()['data'][0]['id']
     return user_id
 
 def get_login_from_id(user_id):
-    url = 'https://api.twitch.tv/helix/users?id=' + user_id
+    url = BASIC_URL + 'users?id=' + user_id
     req = requests.get(url, headers=headers)
     user_login = req.json()['data'][0]['login']
     return user_login
 
 def get_stream_data(user_id):
-    url = 'https://api.twitch.tv/helix/streams?user_id=' + user_id
+    url = BASIC_URL + 'streams?user_id=' + user_id
     req = requests.get(url, headers=headers)
     json_data = json.loads(req.text)
     try:
@@ -55,7 +58,7 @@ def get_stream_data(user_id):
         return False
 
 def get_clip_data(clip_id):
-    url = 'https://api.twitch.tv/helix/clips?id=' + clip_id
+    url = BASIC_URL + 'clips?id=' + clip_id
     req = requests.get(url, headers=headers)
     json_data = json.loads(req.text)
     clip_data = json_data["data"][0]
@@ -75,28 +78,28 @@ def using_pagination(url):
 
 def get_follow_data(user_id):
     # 이 함수는 유저가 팔로우하는 사람의 목록입니다
-    url = 'https://api.twitch.tv/helix/users/follows?from_id=' + user_id + '&first=100'
+    url = BASIC_URL + 'users/follows?from_id=' + user_id + '&first=100'
     follow_data = using_pagination(url)
     return follow_data
 
 def get_follower_data(user_id):
     # 이 함수는 유저를 팔로우하는 사람의 목록입니다
-    url = 'https://api.twitch.tv/helix/users/follows?to_id=' + user_id + '&first=100'
+    url = BASIC_URL + 'users/follows?to_id=' + user_id + '&first=100'
     follower_data = using_pagination(url)
     return follower_data
 
 def get_clip_list(user_id, start_time, end_time):
-    url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + user_id + '&first=100&started_at=' + start_time + '&ended_at=' + end_time
+    url = BASIC_URL + 'clips?broadcaster_id=' + user_id + '&first=100&started_at=' + start_time + '&ended_at=' + end_time
     clip_list = using_pagination(url)
     return clip_list
 
 def get_schedule_data(user_id, start_time):
-    url = 'https://api.twitch.tv/helix/schedule?broadcaster_id=' + user_id + '&started_at=' + start_time + '&first=25'
+    url = BASIC_URL + 'schedule?broadcaster_id=' + user_id + '&started_at=' + start_time + '&first=25'
     schedule_data = using_pagination(url)
     return schedule_data
 
 def get_vod_data(user_id, period):
-    url = 'https://api.twitch.tv/helix/videos?user_id=' + user_id + '&period=' + period + '&first=100&type=archive'
+    url = BASIC_URL + 'videos?user_id=' + user_id + '&period=' + period + '&first=100&type=archive'
     vod_data = using_pagination(url)
     return vod_data
 
