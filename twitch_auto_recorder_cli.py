@@ -21,9 +21,14 @@ while True:
     stream_data = twitch_api.get_stream_data(user_id)
     if stream_data is not False:
         function.console_print("Stream started")
-        recorder.download_stream_m3u8_legacy(user_login, 'ts')
-        function.console_print("Stream ended")
-        repeat_check = True
+        try:
+            recorder.download_stream_m3u8_legacy(user_login, 'ts')
+            function.console_print("Stream ended")
+            repeat_check = True
+        except:
+            function.console_print("Stream ended")
+            repeat_check = True
+            continue
     else:
         if repeat_check:
             function.console_print("Waiting for {} to start streaming".format(user_login))
