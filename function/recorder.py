@@ -27,25 +27,27 @@ def download_stream_legacy(user_login, extension):
 def download_stream_m3u8_legacy(user_login, extension):
     path = basic_file_info(user_login, extension)
     try:
-        serverless_m3u8 = get_stream_m3u8_serverless(user_login)
-        pwnsh_m3u8 = get_stream_m3u8_pwnsh(user_login)
-
-        # if serverless_m3u8 have 1080p60 or 1080p30 key then use serverless_m3u8
-        if "1080p60" in serverless_m3u8.keys():
-            stream_m3u8 = serverless_m3u8["1080p60"]
-            message = "use serverless download 1080p60"
-        elif "1080p30" in serverless_m3u8.keys():
-            stream_m3u8 = serverless_m3u8["1080p30"]
-            message = "use serverless download 1080p30"
-        elif "1080p60" in pwnsh_m3u8.keys():
-            stream_m3u8 = pwnsh_m3u8["1080p60"]
-            message = "use pwnsh download 1080p60"
-        elif "1080p30" in pwnsh_m3u8.keys():
-            stream_m3u8 = pwnsh_m3u8["1080p30"]
-            message = "use pwnsh download 1080p30"
-        else:
-            stream_m3u8 = get_stream_m3u8_streamlink(user_login)["best"]
-            message = "can't use 1080p, instead 720p using streamlink"
+        for i in range(0, 4):
+            serverless_m3u8 = get_stream_m3u8_serverless(user_login)
+            pwnsh_m3u8 = get_stream_m3u8_pwnsh(user_login)
+            # if serverless_m3u8 have 1080p60 or 1080p30 key then use serverless_m3u8
+            if "1080p60" in serverless_m3u8.keys():
+                stream_m3u8 = serverless_m3u8["1080p60"]
+                message = "use serverless download 1080p60"
+                break
+            elif "1080p30" in serverless_m3u8.keys():
+                stream_m3u8 = serverless_m3u8["1080p30"]
+                message = "use serverless download 1080p30"
+                break
+            elif "1080p60" in pwnsh_m3u8.keys():
+                stream_m3u8 = pwnsh_m3u8["1080p60"]
+                message = "use pwnsh download 1080p60"
+            elif "1080p30" in pwnsh_m3u8.keys():
+                stream_m3u8 = pwnsh_m3u8["1080p30"]
+                message = "use pwnsh download 1080p30"
+            else:
+                stream_m3u8 = get_stream_m3u8_streamlink(user_login)["best"]
+                message = "can't use 1080p, instead 720p using streamlink"
 
     except:
         stream_m3u8 = get_stream_m3u8_streamlink(user_login)["best"]
