@@ -7,30 +7,38 @@ import time
 import os
 import hashlib
 
-def clip_download_threading(clip_data):
+def clip_download_thread(clip_data):
     clip_link = clip_data["thumbnail_url"].split("-preview-")[0] + ".mp4"
+    clip_file_name = clip_data["hash_id"] + ".mp4"
+    temp_file_name = clip_data["hash_id"] + ".temp"
+    file_dir = "clips/{}/{}".format(user_login, temp_file_name)
 
-    clip_count_in_thread = clip_count - len(clip_list)
-    clip_list.remove(clip_data)
-
-    file_name = clip_data["hash_id"] + ".mp4"
-    file_dir = "clips/{}/{}".format(user_login, file_name)
     try:
         req = requests.get(clip_link, stream=True)
         with open(file_dir, "wb") as f:
             for chunk in req.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
-        function.console_print("Download Complete: {} ({}/{})".format(file_name, clip_count_in_thread, clip_count))
+        
+        # change file extension to mp4
+        os.rename(file_dir, file_dir.replace(".temp", ".mp4"))
+
+        clip_count_in_thread = get_current_file_number("clips/{}".format(user_login), "mp4")
+        function.console_print("Download Complete: {} ({}/{})".format(clip_file_name, clip_count_in_thread, clip_count))
     except:
-        clip_list.append(clip_data)
+        function.console_print("Download Failed: {}".format(clip_file_name))
+
+def get_current_file_number(directory, extension):
+    file_list = os.listdir(directory)
+    extension_filtered = filter(lambda x: x.endswith('.' + extension), file_list)
+    num_extension_filtered = len(list(extension_filtered))
+
+    return num_extension_filtered
 
 twitch_api.get_header_online()
-
 function.console_print("Clipper Start")
 
-# 스트리머 정보를 가져옴
-user_login = 'ryung971219'
+user_login = "ryung971219"
 user_id = twitch_api.get_id_from_login(user_login)
 
 if not os.path.exists("clips/{}".format(user_login)):
@@ -38,44 +46,48 @@ if not os.path.exists("clips/{}".format(user_login)):
 
 function.console_print("Streamer: {}".format(user_login))
 
-# 스트리머의 클립 정보를 가져옴
-# start and end time as RFC3339 format
-start_time = datetime(2000, 1, 1, 0, 0, 0).isoformat() + 'Z'
-# end time is tomorrow
-end_time = datetime.now() + timedelta(days=1)
-end_time = end_time.isoformat() + 'Z'
+start_time = datetime(2000, 1, 1, 0, 0, 0).isoformat() + "Z"
+end_time = (datetime.now() + timedelta(days=1)).isoformat() + "Z"
 clip_list = twitch_api.get_clip_list(user_id, start_time, end_time)
-
 clip_count = len(clip_list)
+
+download_queue = []
 
 function.console_print("Clip Count: {}".format(clip_count))
 
 for clip_data in clip_list:
     hash_raw = clip_data["broadcaster_name"] + clip_data["created_at"]
-    # hash to sha256
     hash_id = hashlib.sha256(hash_raw.encode()).hexdigest()
     clip_data["hash_id"] = hash_id
+    download_queue.append(clip_data)
 
-# 클립 정보를 json 파일로 저장
-# clip_list = json.loads(clip_list)
-with open("clips/{}_clip_list.json".format(user_login), "w") as f:
-    f.write(json.dumps(clip_list, indent=4))
+with open("clips/{}/clip_list.json".format(user_login), "w") as f:
+    f.write(json.dumps(clip_list, indent=4, ensure_ascii=False))
 
-function.console_print("Clip List Save Complete: clips/{}_clip_list.json".format(user_login))
+function.console_print("Clip List Save Complete: clips/{}/clip_list.json".format(user_login))
 
-# 파일 다운로드
-while len(clip_list) > 0:
-    while threading.active_count() > 10:
-        time.sleep(0.1)
-    threading.Thread(target=clip_download_threading, args=(clip_list[0],)).start()
+while len(clip_list) != get_current_file_number("clips/{}".format(user_login), "mp4"):
+    # download logic
+    while len(download_queue) > 0:
+        while threading.active_count() > 10:
+            time.sleep(0.2)
+        current_file = download_queue.pop()
+        threading.Thread(target=clip_download_thread, args=(current_file,)).start()
 
-# check file number and compare with clip count
-file_list = os.listdir("clips/{}".format(user_login))
-if len(file_list) != clip_count:
-    function.console_print("some files are not downloaded. program will be retry to download.")
-    while len(clip_list) > 0:
-        # manual download
-        for clip_link in clip_list:
-            clip_download_threading(clip_link)
-        
-function.console_print("{} clips are successfully downloaded".format(len(file_list)))
+    # wait for all download complete (thread number == 1)
+    while threading.active_count() != 1:
+        time.sleep(1)
+
+    # get current file list and compare with clip_list and update download_queue
+    current_file_list = os.listdir("clips/{}".format(user_login))
+    for clip_data in clip_list:
+        if clip_data["hash_id"] + ".mp4" not in current_file_list:
+            download_queue.append(clip_data)
+
+    # print result
+    if len(download_queue) != 0:
+        function.console_print("{} clips are not downloaded. retrying...".format(len(download_queue)))
+    else:
+        file_num = get_current_file_number("clips/{}".format(user_login), "mp4")
+        if len(clip_list) == file_num:
+            function.console_print("{} clips are successfully downloaded".format(file_num))
