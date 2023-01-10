@@ -1,4 +1,4 @@
-from function import (function, recorder, twitch_api)
+from function import (function, twitch_api)
 from datetime import (datetime, timedelta)
 import requests
 import json

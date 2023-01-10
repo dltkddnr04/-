@@ -2,6 +2,7 @@ from function import (function, twitch_api, recorder)
 from datetime import datetime
 import time
 import sys
+import os
 
 twitch_api.get_header_online()
 
@@ -14,6 +15,9 @@ except:
     print("streamer nickname is not exist")
     exit()
 user_id = twitch_api.get_id_from_login(user_login)
+
+if not os.path.exists("{}".format(user_login)):
+    os.makedirs("{}".format(user_login))
 
 function.console_print("Program started")
 
