@@ -13,6 +13,11 @@ def clip_download_thread(clip_data):
     temp_file_name = clip_data["hash_id"] + ".temp"
     file_dir = "clips/{}/{}".format(user_login, temp_file_name)
 
+    # if file already exsist then skip
+    if os.path.isfile(file_dir.replace(".temp", ".mp4")):
+        # function.console_print("Already Downloaded: {}".format(clip_file_name))
+        return
+
     try:
         req = requests.get(clip_link, stream=True)
         with open(file_dir, "wb") as f:
@@ -25,8 +30,10 @@ def clip_download_thread(clip_data):
 
         clip_count_in_thread = get_current_file_number("clips/{}".format(user_login), "mp4")
         function.console_print("Download Complete: {} ({}/{})".format(clip_file_name, clip_count_in_thread, clip_count))
+        return
     except:
         function.console_print("Download Failed: {}".format(clip_file_name))
+        return
 
 def get_current_file_number(directory, extension):
     file_list = os.listdir(directory)
@@ -48,18 +55,21 @@ function.console_print("Streamer: {}".format(user_login))
 
 start_time = datetime(2000, 1, 1, 0, 0, 0).isoformat() + "Z"
 end_time = (datetime.now() + timedelta(days=1)).isoformat() + "Z"
-clip_list = twitch_api.get_clip_list(user_id, start_time, end_time)
-clip_count = len(clip_list)
-
+clip_list_raw = twitch_api.get_clip_list(user_id, start_time, end_time)
+clip_list = []
 download_queue = []
 
+for clip_data in clip_list_raw:
+    if clip_data not in clip_list:
+        clip_list.append(clip_data)
+
+clip_count = len(clip_list)
 function.console_print("Clip Count: {}".format(clip_count))
 
 for clip_data in clip_list:
-    hash_raw = clip_data["broadcaster_name"] + clip_data["created_at"]
+    hash_raw = clip_data["broadcaster_name"] + clip_data["created_at"] + clip_data["id"]
     hash_id = hashlib.sha256(hash_raw.encode()).hexdigest()
     clip_data["hash_id"] = hash_id
-    download_queue.append(clip_data)
 
 with open("clips/{}/clip_list.json".format(user_login), "w") as f:
     f.write(json.dumps(clip_list, indent=4, ensure_ascii=False))
@@ -67,27 +77,31 @@ with open("clips/{}/clip_list.json".format(user_login), "w") as f:
 function.console_print("Clip List Save Complete: clips/{}/clip_list.json".format(user_login))
 
 while len(clip_list) != get_current_file_number("clips/{}".format(user_login), "mp4"):
-    # download logic
-    while len(download_queue) > 0:
-        while threading.active_count() > 10:
-            time.sleep(0.2)
-        current_file = download_queue.pop()
-        threading.Thread(target=clip_download_thread, args=(current_file,)).start()
-
-    # wait for all download complete (thread number == 1)
-    while threading.active_count() != 1:
-        time.sleep(1)
-
     # get current file list and compare with clip_list and update download_queue
     current_file_list = os.listdir("clips/{}".format(user_login))
     for clip_data in clip_list:
         if clip_data["hash_id"] + ".mp4" not in current_file_list:
             download_queue.append(clip_data)
 
-    # print result
-    if len(download_queue) != 0:
-        function.console_print("{} clips are not downloaded. retrying...".format(len(download_queue)))
-    else:
-        file_num = get_current_file_number("clips/{}".format(user_login), "mp4")
-        if len(clip_list) == file_num:
-            function.console_print("{} clips are successfully downloaded".format(file_num))
+    if get_current_file_number("clips/{}".format(user_login), "mp4") == 0:
+        function.console_print("Download Start")
+    elif len(download_queue) != 0:
+        function.console_print("{} clips are not downloaded".format(len(download_queue)))
+
+    # download logic
+    while len(download_queue) > 0:
+        while threading.active_count() < 10:
+            if len(download_queue) == 0:
+                break
+            else:
+                current_file = download_queue.pop()
+                threading.Thread(target=clip_download_thread, args=(current_file,)).start()
+        time.sleep(0.5)
+
+    while threading.active_count() != 1:
+        time.sleep(1)
+
+file_num = get_current_file_number("clips/{}".format(user_login), "mp4")
+# print("Final Check ({}/{})".format(file_num, clip_count))
+if len(clip_list) == file_num:
+    function.console_print("{} clips are successfully downloaded".format(file_num))
