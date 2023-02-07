@@ -2,7 +2,6 @@ import requests
 import json
 
 BASIC_URL = 'https://api.twitch.tv/helix/'
-# BASIC_URL = 'https://twitchapibypass.twitch-auto-recorder.workers.dev/'
 
 def get_access_token(client_id, client_secret):
     url = 'https://id.twitch.tv/oauth2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=client_credentials'
