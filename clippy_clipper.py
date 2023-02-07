@@ -8,7 +8,7 @@ import os
 import hashlib
 
 def clip_download_thread(clip_data):
-    clip_link = clip_data["thumbnail_url"].split("-preview-")[0] + ".mp4"
+    clip_link = clip_data["downloadLink"]
     clip_file_name = clip_data["hash_id"] + ".mp4"
     temp_file_name = clip_data["hash_id"] + ".temp"
     file_dir = "clips/{}/{}".format(user_login, temp_file_name)
@@ -53,9 +53,10 @@ if not os.path.exists("clips/{}".format(user_login)):
 
 function.console_print("Streamer: {}".format(user_login))
 
-start_time = datetime(2000, 1, 1, 0, 0, 0).isoformat() + "Z"
-end_time = (datetime.now() + timedelta(days=1)).isoformat() + "Z"
-clip_list_raw = twitch_api.get_clip_list(user_id, start_time, end_time)
+url = url = "https://api.clippy.kr/clip/user/{}".format(user_id)
+req = requests.get(url)
+clip_list_raw = req.json()
+clip_list_raw = clip_list_raw["data"]
 clip_list = []
 download_queue = []
 
@@ -67,7 +68,7 @@ clip_count = len(clip_list)
 function.console_print("Clip Count: {}".format(clip_count))
 
 for clip_data in clip_list:
-    hash_raw = clip_data["broadcaster_name"] + clip_data["created_at"] + clip_data["id"]
+    hash_raw = clip_data["userInfo"]["display_name"] + clip_data["created_at"] + clip_data["key"]
     hash_id = hashlib.sha256(hash_raw.encode()).hexdigest()
     clip_data["hash_id"] = hash_id
 
