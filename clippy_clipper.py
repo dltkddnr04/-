@@ -72,10 +72,10 @@ for clip_data in clip_list:
     hash_id = hashlib.sha256(hash_raw.encode()).hexdigest()
     clip_data["hash_id"] = hash_id
 
-with open("clips/{}.json".format(user_login), "w") as f:
+with open("clips/{}_clippy.json".format(user_login), "w") as f:
     f.write(json.dumps(clip_list, indent=4, ensure_ascii=False))
 
-function.console_print("Clip List Save Complete: clips/{}.json".format(user_login))
+function.console_print("Clip List Save Complete: clips/{}_clippy.json".format(user_login))
 
 while len(clip_list) != get_current_file_number("clips/{}".format(user_login), "mp4"):
     # get current file list and compare with clip_list and update download_queue
