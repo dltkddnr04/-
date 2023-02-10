@@ -29,10 +29,10 @@ def clip_download_thread(clip_data):
         os.rename(file_dir, file_dir.replace(".temp", ".mp4"))
 
         clip_count_in_thread = get_current_file_number("clips/{}".format(user_login), "mp4")
-        function.console_print("Download Complete: {} ({}/{})".format(clip_file_name, clip_count_in_thread, clip_count))
+        function.console_print("다운로드 완료: {} ({}/{})".format(clip_file_name, clip_count_in_thread, clip_count))
         return
     except:
-        function.console_print("Download Failed: {}".format(clip_file_name))
+        function.console_print("다운로드 실패: {}".format(clip_file_name))
         return
 
 def get_current_file_number(directory, extension):
@@ -43,15 +43,19 @@ def get_current_file_number(directory, extension):
     return num_extension_filtered
 
 twitch_api.get_header_online()
-function.console_print("Clipper Start")
+function.console_print("클리피 다운로더")
 
-user_login = "ryung971219"
+'''
+user_list = ["ryung971219", "liyel", "dookongc", "zomul_e", "diony0409", "kkoduengeo", "rnxogns9", "mauve_37", "einaholic", "sooflower", "zia_kwon", "magenta62"]
+user_login = user_list[11]
+'''
+user_login = input("스트리머 영문 닉네임: ")
 user_id = twitch_api.get_id_from_login(user_login)
 
 if not os.path.exists("clips/{}".format(user_login)):
     os.makedirs("clips/{}".format(user_login))
 
-function.console_print("Streamer: {}".format(user_login))
+# function.console_print("Streamer: {}".format(user_login))
 
 url = url = "https://api.clippy.kr/clip/user/{}".format(user_id)
 req = requests.get(url)
@@ -65,7 +69,7 @@ for clip_data in clip_list_raw:
         clip_list.append(clip_data)
 
 clip_count = len(clip_list)
-function.console_print("Clip Count: {}".format(clip_count))
+function.console_print("클립 개수: {}".format(clip_count))
 
 for clip_data in clip_list:
     hash_raw = clip_data["userInfo"]["display_name"] + clip_data["created_at"] + clip_data["key"]
@@ -75,7 +79,7 @@ for clip_data in clip_list:
 with open("clips/{}_clippy.json".format(user_login), "w") as f:
     f.write(json.dumps(clip_list, indent=4, ensure_ascii=False))
 
-function.console_print("Clip List Save Complete: clips/{}_clippy.json".format(user_login))
+function.console_print("리스트 저장 완료: clips/{}_clippy.json".format(user_login))
 
 while len(clip_list) != get_current_file_number("clips/{}".format(user_login), "mp4"):
     # get current file list and compare with clip_list and update download_queue
@@ -87,7 +91,7 @@ while len(clip_list) != get_current_file_number("clips/{}".format(user_login), "
     if get_current_file_number("clips/{}".format(user_login), "mp4") == 0:
         function.console_print("Download Start")
     elif len(download_queue) != 0:
-        function.console_print("{} clips are not downloaded".format(len(download_queue)))
+        function.console_print("클립 {}개 저장 실패".format(len(download_queue)))
 
     # download logic
     while len(download_queue) > 0:
@@ -105,4 +109,4 @@ while len(clip_list) != get_current_file_number("clips/{}".format(user_login), "
 file_num = get_current_file_number("clips/{}".format(user_login), "mp4")
 # print("Final Check ({}/{})".format(file_num, clip_count))
 if len(clip_list) == file_num:
-    function.console_print("{} clips are successfully downloaded".format(file_num))
+    function.console_print("클립 {}개 다운로드 완료".format(file_num))
