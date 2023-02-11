@@ -72,13 +72,12 @@ clip_count = len(clip_list)
 function.console_print("클립 개수: {}".format(clip_count))
 
 for clip_data in clip_list:
-    # hash_raw = clip_data["userInfo"]["display_name"] + clip_data["created_at"] + clip_data["key"]
-    # hash_id = hashlib.sha256(hash_raw.encode()).hexdigest()
-    # clip_data["hash_id"] = hash_id
-    clip_data["hash_id"] = "{} {}".format(clip_data["created_at"], clip_data["title"])
+    hash_raw = clip_data["userInfo"]["display_name"] + clip_data["created_at"] + clip_data["key"]
+    hash_id = hashlib.sha256(hash_raw.encode()).hexdigest()
+    clip_data["hash_id"] = hash_id
 
 with open("clips/{}_clippy.json".format(user_login), "w") as f:
-    f.write(json.dumps(clip_list, indent=4))
+    f.write(json.dumps(clip_list, indent=4, ensure_ascii=False))
 
 function.console_print("리스트 저장 완료: clips/{}_clippy.json".format(user_login))
 
