@@ -78,7 +78,7 @@ for clip_data in clip_list:
     clip_data["hash_id"] = "{} {}".format(clip_data["created_at"], clip_data["title"])
 
 with open("clips/{}_clippy.json".format(user_login), "w") as f:
-    f.write(json.dumps(clip_list, indent=4, ensure_ascii=False))
+    f.write(json.dumps(clip_list, indent=4))
 
 function.console_print("리스트 저장 완료: clips/{}_clippy.json".format(user_login))
 
