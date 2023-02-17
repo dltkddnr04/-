@@ -60,7 +60,27 @@ def download_stream_m3u8_legacy(user_login, extension):
         subprocess.run(["streamlink", stream_m3u8, "best", "-o", path], creationflags=CREATE_NO_WINDOW)
     else:
         subprocess.run(["streamlink", stream_m3u8, "best", "-o", path])
+    return
 
+def download_stream_direct(user_login, extension):
+    path = basic_file_info(user_login, extension)
+    try:
+        token, sig = get_stream_access_token(user_login)
+        stream_m3u8_list = get_stream_m3u8_direct(user_login, sig, token)
+        stream_m3u8 = stream_m3u8_list["1080p60"]
+        message = "use direct download"
+    except:
+        stream_m3u8 = get_stream_m3u8_streamlink(user_login)["best"]
+        message = "can't use direct, instead using streamlink"
+
+    function.console_print(message)
+    function.console_print("download dir: {path}".format(path=path))
+
+    if platform.system() == "Windows":
+        CREATE_NO_WINDOW = 0x08000000
+        subprocess.run(["streamlink", stream_m3u8, "best", "-o", path], creationflags=CREATE_NO_WINDOW)
+    else:
+        subprocess.run(["streamlink", stream_m3u8, "best", "-o", path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return
 
 def get_stream_access_token(user_login):
@@ -102,6 +122,34 @@ def get_stream_access_token_serverless(user_login):
     token = data['token']
 
     return token, sig
+
+def get_stream_m3u8_direct(streamer, sig, token):
+    params = {
+        'sig': sig,
+        'token': token,
+        'allow_source': 'true',
+        'allow_audio_only': 'true',
+        'p': int(random.random() * 999999),
+    }
+
+    url = "https://usher.ttvnw.net/api/channel/hls/{streamer}.m3u8".format(streamer=streamer)
+    url += '?' + '&'.join(['%s=%s' % (key, value) for (key, value) in params.items()])
+
+    req = requests.get(url)
+    data = req.text.splitlines()
+
+    list = {}
+    for i in range(3, len(data), 3):
+        try:
+            quality = data[i].split(",")[1].split("=")[1].split("x")[1]
+            frame = data[i].split(",")[5].split("=")[1].split(".")[0]
+            url = data[i+1]
+            list["{}p{}".format(quality, frame)] = url
+        except:
+            url = data[i+1]
+            list["audio_only"] = url
+
+    return list
 
 def get_stream_m3u8_streamlink(user_login):
     stream_url = "https://www.twitch.tv/" + user_login
