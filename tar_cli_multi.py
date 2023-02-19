@@ -25,7 +25,7 @@ def stream_download_solo(user_login):
                 repeat_check = True
             except Exception as e:
                 function.console_print("[{user_login}] Stream ended".format(user_login=user_login))
-                print("Error: {}".format(e))
+                # print("Error: {}".format(e))
                 repeat_check = True
                 continue
         else:
