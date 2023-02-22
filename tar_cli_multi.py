@@ -9,14 +9,26 @@ twitch_api.get_header_online()
 function.console_print("Program started")
 
 def stream_download_solo(user_login):
-    user_id = twitch_api.get_id_from_login(user_login)
+    user_id = None
+    while user_id is None:
+        try:
+            user_id = twitch_api.get_id_from_login(user_login)
+        except:
+            time.sleep(5)
+            continue
     repeat_check = True
 
     if not os.path.exists("{}".format(user_login)):
         os.makedirs("{}".format(user_login))
 
     while True:
-        stream_data = twitch_api.get_stream_data(user_id)
+        stream_data = None
+        while stream_data is None:
+            try:
+                stream_data = twitch_api.get_stream_data(user_id)
+            except:
+                time.sleep(5)
+                continue
         if stream_data is not False:
             function.console_print("[{user_login}] Stream started".format(user_login=user_login))
             try:
@@ -49,4 +61,4 @@ for user_login in user_login_list:
     thread.start()
 
 while True:
-    time.sleep(10)
+    time.sleep(60)
