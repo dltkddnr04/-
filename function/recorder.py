@@ -67,8 +67,18 @@ def download_stream_direct(user_login, extension):
     try:
         token, sig = get_stream_access_token(user_login)
         stream_m3u8_list = get_stream_m3u8_direct(user_login, sig, token)
-        stream_m3u8 = stream_m3u8_list["1080p60"]
-        message = "use direct download"
+        if "1080p60" in stream_m3u8_list.keys():
+            stream_m3u8 = stream_m3u8_list["1080p60"]
+            message = "use direct download 1080p60"
+        elif "1080p30" in stream_m3u8_list.keys():
+            stream_m3u8 = stream_m3u8_list["1080p30"]
+            message = "use direct download 1080p30"
+        elif "720p60" in stream_m3u8_list.keys():
+            stream_m3u8 = stream_m3u8_list["720p60"]
+            message = "use direct download 720p60"
+        elif "720p30" in stream_m3u8_list.keys():
+            stream_m3u8 = stream_m3u8_list["720p30"]
+            message = "use direct download 720p30"
     except:
         stream_m3u8 = get_stream_m3u8_streamlink(user_login)["best"]
         message = "can't use direct, instead using streamlink"
