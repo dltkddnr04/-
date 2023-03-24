@@ -79,6 +79,8 @@ def download_stream_direct(user_login, extension):
         elif "720p30" in stream_m3u8_list.keys():
             stream_m3u8 = stream_m3u8_list["720p30"]
             message = "use direct download 720p30"
+        else:
+            stream_m3u8 = stream_m3u8_list["2160p120"]
     except:
         stream_m3u8 = get_stream_m3u8_streamlink(user_login)["best"]
         message = "can't use direct, instead using streamlink"
