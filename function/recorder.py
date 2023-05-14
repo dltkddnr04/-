@@ -153,7 +153,9 @@ def get_stream_m3u8_direct(streamer, sig, token):
     list = {}
     for i in range(3, len(data), 3):
         try:
-            quality = data[i].split(",")[1].split("=")[1].split("x")[1]
+            quality1 = data[i].split(",")[1].split("=")[1].split("x")[0]
+            quality2 = data[i].split(",")[1].split("=")[1].split("x")[1]
+            quality = quality1 if int(quality1) < int(quality2) else quality2
             frame = data[i].split(",")[5].split("=")[1].split(".")[0]
             url = data[i+1]
             list["{}p{}".format(quality, frame)] = url
@@ -181,7 +183,9 @@ def get_stream_m3u8_serverless(user_login):
     list = {}
     for i in range(3, len(data), 3):
         try:
-            quality = data[i].split(",")[1].split("=")[1].split("x")[1]
+            quality1 = data[i].split(",")[1].split("=")[1].split("x")[0]
+            quality2 = data[i].split(",")[1].split("=")[1].split("x")[1]
+            quality = quality1 if int(quality1) < int(quality2) else quality2
             frame = data[i].split(",")[5].split("=")[1].split(".")[0]
             url = data[i+1]
             list["{}p{}".format(quality, frame)] = url
@@ -209,7 +213,9 @@ def get_stream_m3u8_tokyo_fix(user_login):
     list = {}
     for i in range(3, len(data), 3):
         try:
-            quality = data[i].split(",")[1].split("=")[1].split("x")[1]
+            quality1 = data[i].split(",")[1].split("=")[1].split("x")[0]
+            quality2 = data[i].split(",")[1].split("=")[1].split("x")[1]
+            quality = quality1 if int(quality1) < int(quality2) else quality2
             frame = data[i].split(",")[5].split("=")[1].split(".")[0]
             url = data[i+1]
             list["{}p{}".format(quality, frame)] = url
