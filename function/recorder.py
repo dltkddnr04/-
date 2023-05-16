@@ -137,11 +137,11 @@ def get_stream_access_token_serverless(user_login):
 
 def get_stream_m3u8_direct(streamer, sig, token):
     params = {
+        'allow_source': True,
+        'p': int(random.random() * 999999),
         'sig': sig,
         'token': token,
-        'allow_source': 'true',
-        'allow_audio_only': 'true',
-        'p': int(random.random() * 999999),
+        'allow_audio_only': True,   
     }
 
     url = "https://usher.ttvnw.net/api/channel/hls/{streamer}.m3u8".format(streamer=streamer)

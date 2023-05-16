@@ -5,31 +5,24 @@ import sys
 import os
 import threading
 
-twitch_api.get_header_online()
 function.console_print("Program started")
 
 def stream_download_solo(user_login):
-    user_id = None
-    while user_id is None:
-        try:
-            user_id = twitch_api.get_id_from_login(user_login)
-        except:
-            time.sleep(5)
-            continue
     repeat_check = True
 
     if not os.path.exists("{}".format(user_login)):
         os.makedirs("{}".format(user_login))
 
     while True:
-        stream_data = None
-        while stream_data is None:
+        stream_data = {}
+        while stream_data == {}:
             try:
-                stream_data = twitch_api.get_stream_data(user_id)
+                token, sig = recorder.get_stream_access_token(user_login)
+                stream_data = recorder.get_stream_m3u8_direct(user_login, sig, token)
             except:
-                time.sleep(5)
+                time.sleep(1)
                 continue
-        if stream_data is not False:
+        if stream_data != {}:
             function.console_print("[{user_login}] Stream started".format(user_login=user_login))
             try:
                 recorder.download_stream_direct(user_login, 'ts')
@@ -44,7 +37,7 @@ def stream_download_solo(user_login):
             if repeat_check:
                 function.console_print("[{user_login}] Waiting to start streaming".format(user_login=user_login))
                 repeat_check = False
-            time.sleep(5)
+            time.sleep(2)
 
 try:
     user_login_list = sys.argv[1:]
