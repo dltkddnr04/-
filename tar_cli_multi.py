@@ -16,28 +16,28 @@ def stream_download_solo(user_login):
     while True:
         stream_data = {}
         while stream_data == {}:
+            if repeat_check:
+                function.console_print("[{user_login}] Waiting to start streaming".format(user_login=user_login))
+                repeat_check = False
+
             try:
                 token, sig = recorder.get_stream_access_token(user_login)
                 stream_data = recorder.get_stream_m3u8_direct(user_login, sig, token)
             except:
-                time.sleep(1)
                 continue
+            
+            time.sleep(1)
+
         if stream_data != {}:
             function.console_print("[{user_login}] Stream started".format(user_login=user_login))
             try:
                 recorder.download_stream_direct(user_login, 'ts')
-                function.console_print("[{user_login}] Stream ended".format(user_login=user_login))
-                repeat_check = True
             except Exception as e:
-                function.console_print("[{user_login}] Stream ended".format(user_login=user_login))
                 # print("Error: {}".format(e))
-                repeat_check = True
                 continue
-        else:
-            if repeat_check:
-                function.console_print("[{user_login}] Waiting to start streaming".format(user_login=user_login))
-                repeat_check = False
-            time.sleep(2)
+
+            function.console_print("[{user_login}] Stream ended".format(user_login=user_login))
+            repeat_check = True
 
 try:
     user_login_list = sys.argv[1:]
