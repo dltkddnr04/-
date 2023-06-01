@@ -98,7 +98,7 @@ def download_stream_direct(user_login, extension):
 def get_stream_access_token(user_login):
     url = "https://gql.twitch.tv/gql#origin=twilight"
     header = {
-        "Client-ID": "kimne78kx3ncx6brgo4mv6wki5h1ko"
+        "Client-ID": "jzkbprff40iqj646a697cyrvl0zt2m6"
     }
     data = {
         "operationName": "PlaybackAccessToken",
