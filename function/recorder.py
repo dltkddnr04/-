@@ -8,7 +8,7 @@ import json
 import random
 
 def basic_file_info(user_login, extension):
-    date = datetime.today().strftime('%Y-%m-%d %H-%M-%S')
+    date = datetime.today().strftime('%Y-%m-%dT%H-%M-%S')
     path = './' + user_login + '/' + date + '.' + extension
     return path
 
@@ -98,7 +98,8 @@ def download_stream_direct(user_login, extension):
 def get_stream_access_token(user_login):
     url = "https://gql.twitch.tv/gql#origin=twilight"
     header = {
-        "Client-ID": "jzkbprff40iqj646a697cyrvl0zt2m6"
+        # "Client-ID": "jzkbprff40iqj646a697cyrvl0zt2m6"
+        "Client-ID": "kimne78kx3ncx6brgo4mv6wki5h1ko"
     }
     data = {
         "operationName": "PlaybackAccessToken",
