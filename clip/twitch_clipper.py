@@ -45,7 +45,7 @@ def get_current_file_number(directory, extension):
 twitch_api.get_header_online()
 function.console_print("Clipper Start")
 
-user_login = "ryung971219"
+user_login = "maruemon1019"
 user_id = twitch_api.get_id_from_login(user_login)
 
 if not os.path.exists("clips/{}".format(user_login)):
