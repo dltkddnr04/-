@@ -73,6 +73,12 @@ def download_stream_direct(user_login, extension):
         elif "1080p30" in stream_m3u8_list.keys():
             stream_m3u8 = stream_m3u8_list["1080p30"]
             message = "use direct download 1080p30"
+        elif "720p60(original)" in stream_m3u8_list.keys():
+            stream_m3u8 = stream_m3u8_list["720p60"]
+            message = "use direct download 720p60(original)"
+        elif "720p30(original)" in stream_m3u8_list.keys():
+            stream_m3u8 = stream_m3u8_list["720p30"]
+            message = "use direct download 720p30(original)"
         elif "720p60" in stream_m3u8_list.keys():
             stream_m3u8 = stream_m3u8_list["720p60"]
             message = "use direct download 720p60"
@@ -142,7 +148,7 @@ def get_stream_m3u8_direct(streamer, sig, token):
         'p': int(random.random() * 999999),
         'sig': sig,
         'token': token,
-        'allow_audio_only': True,   
+        'allow_audio_only': True,
     }
 
     url = "https://usher.ttvnw.net/api/channel/hls/{streamer}.m3u8".format(streamer=streamer)
@@ -158,8 +164,14 @@ def get_stream_m3u8_direct(streamer, sig, token):
             quality2 = data[i].split(",")[1].split("=")[1].split("x")[1]
             quality = quality1 if int(quality1) < int(quality2) else quality2
             frame = data[i].split(",")[5].split("=")[1].split(".")[0]
+            video_nick = data[i].split(",")[4].split("\"")[1]
             url = data[i+1]
-            list["{}p{}".format(quality, frame)] = url
+
+            if video_nick == "chunked":
+                list["{}p{}(original)".format(quality, frame)] = url
+            else:
+                list["{}p{}".format(quality, frame)] = url
+
         except:
             url = data[i+1]
             list["audio_only"] = url

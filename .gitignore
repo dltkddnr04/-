@@ -1,7 +1,5 @@
 .DS_Store
 __pycache__
-clips
-filetest
 shazam_project
-dt
 video_sample
+image_hash_sample
