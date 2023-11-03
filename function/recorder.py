@@ -68,32 +68,29 @@ def download_stream_direct(user_login, extension):
         token, sig = get_stream_access_token(user_login)
         stream_m3u8_list = get_stream_m3u8_direct(user_login, sig, token)
 
-        if "1080p60(original)" in stream_m3u8_list.keys():
-            stream_m3u8 = stream_m3u8_list["1080p60(original)"]
-            message = "use direct download 1080p60(original)"
-        elif "1080p30(original)" in stream_m3u8_list.keys():
-            stream_m3u8 = stream_m3u8_list["1080p30(original)"]
-            message = "use direct download 1080p30(original)"
-        elif "1080p30" in stream_m3u8_list.keys():
-            stream_m3u8 = stream_m3u8_list["1080p30"]
-            message = "use direct download 1080p30"
-        elif "1080p30" in stream_m3u8_list.keys():
-            stream_m3u8 = stream_m3u8_list["1080p30"]
-            message = "use direct download 1080p30"
-        elif "720p60(original)" in stream_m3u8_list.keys():
-            stream_m3u8 = stream_m3u8_list["720p60(original)"]
-            message = "use direct download 720p60(original)"
-        elif "720p30(original)" in stream_m3u8_list.keys():
-            stream_m3u8 = stream_m3u8_list["720p30(original)"]
-            message = "use direct download 720p30(original)"
-        elif "720p60" in stream_m3u8_list.keys():
-            stream_m3u8 = stream_m3u8_list["720p60"]
-            message = "use direct download 720p60"
-        elif "720p30" in stream_m3u8_list.keys():
-            stream_m3u8 = stream_m3u8_list["720p30"]
-            message = "use direct download 720p30"
-        else:
-            stream_m3u8 = stream_m3u8_list["4320p240"]
+        m3u8_quality_list = list(stream_m3u8_list.keys())
+        # dict to list
+
+        # remove audio_only
+        m3u8_quality_list.remove('audio_only')
+
+        # get best quality
+        best_quality = None
+        for quality in m3u8_quality_list:
+            print(quality)
+            if quality.endswith('(original)'):
+                best_quality = quality
+                break
+
+            if best_quality is None:
+                best_quality = quality
+            elif int(quality.split('p')[0]) >= int(best_quality.split('p')[0]):
+                if int(quality.split('p')[1]) >= int(best_quality.split('p')[1]):
+                    best_quality = quality
+
+        stream_m3u8 = stream_m3u8_list[best_quality]
+        message = "use direct download {quality}".format(quality=best_quality)
+
     except:
         stream_m3u8 = get_stream_m3u8_streamlink(user_login)["best"]
         message = "can't use direct, instead using streamlink"
