@@ -7,11 +7,22 @@ import requests
 import json
 import random
 
+
+GQL_URL = "https://gql.twitch.tv/gql#origin=twilight"
+INTEGRITY_URL = "https://gql.twitch.tv/integrity"
+HEADERS = {
+    # "Client-ID": "jzkbprff40iqj646a697cyrvl0zt2m6"
+    "Client-ID": "kimne78kx3ncx6brgo4mv6wki5h1ko",
+}
+
 def basic_file_info(user_login, extension):
     date = datetime.today().strftime('%Y-%m-%dT%H-%M-%S')
     path = './' + user_login + '/' + date + '.' + extension
     return path
 
+def get_integrity():
+    req = requests.post(INTEGRITY_URL, headers=HEADERS)
+    return json.loads(req.text)["token"]
 
 def download_stream_legacy(user_login, extension):
     path = basic_file_info(user_login, extension)
@@ -69,15 +80,14 @@ def download_stream_direct(user_login, extension):
         stream_m3u8_list = get_stream_m3u8_direct(user_login, sig, token)
 
         m3u8_quality_list = list(stream_m3u8_list.keys())
-        # dict to list
 
-        # remove audio_only
-        m3u8_quality_list.remove('audio_only')
+        # remove audio_only if exist
+        if "audio_only" in m3u8_quality_list:
+            m3u8_quality_list.remove("audio_only")
 
         # get best quality
         best_quality = None
         for quality in m3u8_quality_list:
-            print(quality)
             if quality.endswith('(original)'):
                 best_quality = quality
                 break
@@ -107,10 +117,8 @@ def download_stream_direct(user_login, extension):
 
 def get_stream_access_token(user_login):
     url = "https://gql.twitch.tv/gql#origin=twilight"
-    header = {
-        # "Client-ID": "jzkbprff40iqj646a697cyrvl0zt2m6"
-        "Client-ID": "kimne78kx3ncx6brgo4mv6wki5h1ko"
-    }
+    header = HEADERS.copy()
+    header["Client-Integrity"] = get_integrity()
     data = {
         "operationName": "PlaybackAccessToken",
         "variables": {
@@ -123,7 +131,7 @@ def get_stream_access_token(user_login):
         "extensions": {
             "persistedQuery": {
                 "version": 1,
-                "sha256Hash": "f51c71103d886ee77e4ff84bfc92352acf66a120413f8e99cfcea092e600936f"
+                "sha256Hash": "3093517e37e4f4cb48906155bcd894150aef92617939236d2508f3375ab732ce"
             }
         }
     }
@@ -148,11 +156,25 @@ def get_stream_access_token_serverless(user_login):
 
 def get_stream_m3u8_direct(streamer, sig, token):
     params = {
-        'allow_source': True,
-        'p': int(random.random() * 999999),
-        'sig': sig,
-        'token': token,
-        'allow_audio_only': True,
+        "acmb": "e30=",
+        "allow_source": True,
+        "browser_family": "firefox",
+        "browser_version": "120.0.1",
+        "cdm": "fp",
+        "fast_bread": True,
+        "os_name": "Linux",
+        "os_version": "22.04.3",
+        "p": int(random.random() * 999999),
+        "platform": "web",
+        "play_session_id": "64dfd083536872a81c1136807d55f976",
+        "player_backend": "mediaplayer",
+        "player_version": "1.23.0",
+        "playlist_include_framerate": True,
+        "reassignments_supported": True,
+        "sig": sig,
+        "supported_codecs": "h265,h264",
+        "token": token,
+        "transcode_mode": "cbr_v1",
     }
 
     url = "https://usher.ttvnw.net/api/channel/hls/{streamer}.m3u8".format(streamer=streamer)

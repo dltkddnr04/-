@@ -31,7 +31,7 @@ def stream_download_solo(user_login):
         if stream_data != {}:
             function.console_print("[{user_login}] Stream started".format(user_login=user_login))
             try:
-                recorder.download_stream_legacy(user_login, 'ts')
+                recorder.download_stream_direct(user_login, 'ts')
             except Exception as e:
                 # print("Error: {}".format(e))
                 continue
