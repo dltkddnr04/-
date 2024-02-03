@@ -112,7 +112,8 @@ def download_stream_direct(user_login, extension):
         CREATE_NO_WINDOW = 0x08000000
         subprocess.run(["streamlink", stream_m3u8, "best", "-o", path], creationflags=CREATE_NO_WINDOW)
     else:
-        subprocess.run(["streamlink", stream_m3u8, "best", "-o", path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # subprocess.run(["streamlink", stream_m3u8, "best", "-o", path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(["ffmpeg", "-i", stream_m3u8, "-c", "copy", path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return
 
 def get_stream_access_token(user_login):
